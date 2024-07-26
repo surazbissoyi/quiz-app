@@ -40,15 +40,33 @@ const questions = [
 const questionElement = document.getElementById("question");
 const answerButtons = document.getElementById("answer-button");
 const nextButton = document.getElementById("next-btn");
+const timerElement = document.getElementById("timer");
 
 let currentQuestionIndex = 0;
 let score = 0;
+let timeLeft = 60;
+let timer;
 
 function startQuiz() {
     currentQuestionIndex = 0;
     score = 0;
     nextButton.innerHTML = "Next";
+    startTimer();
     ShowQuestion();
+}
+
+function startTimer() {
+    timeLeft = 60;
+    timerElement.innerHTML = `Time Left: ${timeLeft}s`;
+    timer = setInterval(() => {
+        timeLeft--;
+        timerElement.innerHTML = `Time Left: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            alert("Time Over!");
+            showScore();
+        }
+    }, 1000);
 }
 
 function ShowQuestion() {
@@ -57,8 +75,6 @@ function ShowQuestion() {
     let questionNo = currentQuestionIndex + 1;
     questionElement.innerHTML = questionNo + ". " + currentQuestion.question;
     
-    // answerButton.innerHTML = ""; 
-
     currentQuestion.answers.forEach(answer => {
         const button = document.createElement("button");
         button.innerHTML = answer.text;
@@ -91,12 +107,13 @@ function selectAnswer(e) {
         if(button.dataset.correct === "true") {
             button.classList.add("correct");
         }
-        button.disabled = "true";
+        button.disabled = true;
     });
     nextButton.style.display = "block";
 }
 
 function showScore() {
+    clearInterval(timer);
     resetState();
     questionElement.innerHTML = `Your scored ${score} out of ${questions.length}!`;
     nextButton.innerHTML = "Play Again";
